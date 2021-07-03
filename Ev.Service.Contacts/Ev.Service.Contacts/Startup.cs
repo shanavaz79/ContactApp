@@ -1,12 +1,20 @@
+using Ev.Service.Contacts.Dto;
+using Ev.Service.Contacts.Logs;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mime;
 using System.Threading.Tasks;
 
 namespace Ev.Service.Contacts
@@ -18,15 +26,36 @@ namespace Ev.Service.Contacts
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvcCore().AddApiExplorer();
-
+            var auditLog = new AuditLog();
+            services.AddSingleton<IAuditLog>(auditLog);
+            services.AddSingleton<IInfoLog, InfoLog>();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Contact Service", Version = "v1" });
             });
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.InvalidModelStateResponseFactory = context =>
+                {
+                    var response = new ApiResponseDto
+                    {
+                        Code = ApiResponseCode.InvalidData,
+                    };
+                    var error = System.Text.Json.JsonSerializer.Serialize(context.ModelState.Values.SelectMany(x => x.Errors.Select(y => y.ErrorMessage)));
+                    var errorMessage = $"Invalid model received. HTTP method:{context.HttpContext.Request.Method} Error: {error}";
+                    response.Errors.Add(new ErrorDto { Error = errorMessage, Code = ApiResponseCode.InvalidData });
+                    var result = new BadRequestObjectResult(response);
+
+                    result.ContentTypes.Add(MediaTypeNames.Application.Json);
+
+                    auditLog.GetInstance().Error(errorMessage);
+                    return result;
+                };
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
         {
             if (env.IsDevelopment())
             {
@@ -34,6 +63,14 @@ namespace Ev.Service.Contacts
             }
 
             app.UseRouting();
+            app.UseSerilogRequestLogging();
+            app.UseExceptionHandler(a => a.Run(async context =>
+            {
+                logger.LogError(context.Features.Get<IExceptionHandlerPathFeature>().Error, string.Empty);
+                var result = JsonConvert.SerializeObject(new { error = "Server error" });
+                context.Response.ContentType = "application/json";
+                await context.Response.WriteAsync(result).ConfigureAwait(false);
+            }));
             //app.UseCors("AllowOrigin");
 
             //app.UseEndpoints(endpoints =>
