@@ -20,6 +20,6 @@ namespace Ev.Service.Contacts.Repository
         {
         }
 
-        public virtual DbSet<Models.Contacts> Contacts { get; set; }
+        public virtual DbSet<Models.Contact> Contacts { get; set; }
     }
 }

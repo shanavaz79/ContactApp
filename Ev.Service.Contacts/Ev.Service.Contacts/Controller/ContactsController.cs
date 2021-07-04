@@ -51,15 +51,30 @@ namespace Ev.Service.Contacts
         [Route("{contactId}")]
         public async Task<IActionResult> GetAsync(int contactId)
         {
-            this.logger.Information($"Group GET Api is called with parameter {contactId}");
+            this.logger.Information($"Contact GET Api is called with parameter {contactId}");
             var response = await this.contactsManager.GetByKeyAsync(contactId).ConfigureAwait(false);
             if (response.Code == ApiResponseCode.Success)
             {
-                this.logger.Information($"Group Get successful for parameter = {contactId} with response = {JsonSerializer.Serialize(response)} ");
+                this.logger.Information($"Contact Get successful for parameter = {contactId} with response = {JsonSerializer.Serialize(response)} ");
                 return this.Ok(response);
             }
 
-            this.logger.Error($"Group Get failed for parameter = {contactId} with response = {JsonSerializer.Serialize(response)} ");
+            this.logger.Error($"Contact Get failed for parameter = {contactId} with response = {JsonSerializer.Serialize(response)} ");
+            return this.BadRequest(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Post(PostContactDto contact)
+        {
+            this.logger.Information($"Contact POST Api called with parameters {JsonSerializer.Serialize(contact)}");
+            var response = await this.contactsManager.AddContact(contact).ConfigureAwait(false);
+            if (response.Code == ApiResponseCode.Success)
+            {
+                this.logger.Information($"Contact POST successful for parameter = {JsonSerializer.Serialize(contact)} with response = {JsonSerializer.Serialize(response)} ");
+                return this.Ok(response);
+            }
+
+            this.logger.Error($"Contact POST failed for parameter = {JsonSerializer.Serialize(contact)} with response = {JsonSerializer.Serialize(response)} ");
             return this.BadRequest(response);
         }
     }
