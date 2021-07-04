@@ -62,14 +62,20 @@ namespace Ev.Service.Contacts.Repository
         /// <summary>
         /// Gets the list of entities.
         /// </summary>
+        /// <param name="filter">The filter.</param>
         /// <param name="limit">The limit.</param>
         /// <param name="offset">The offset.</param>
         /// <param name="orderBy">The order by.</param>
         /// <param name="includeProperties">The include properties.</param>
         /// <returns>List of entities.</returns>
-        public async Task<IEnumerable<TEntity>> GetAsync(int? limit = null, int? offset = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, string includeProperties = "")
+        public async Task<IEnumerable<TEntity>> GetAsync(Expression<Func<TEntity, bool>> filter = null, int? limit = null, int? offset = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, string includeProperties = "")
         {
             IQueryable<TEntity> query = this.dbSet;
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
 
             if (orderBy != null)
             {

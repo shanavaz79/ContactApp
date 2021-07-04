@@ -7,6 +7,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Ev.Service.Contacts
@@ -38,11 +39,27 @@ namespace Ev.Service.Contacts
 
             if (response.Code == ApiResponseCode.Success)
             {
-                this.logger.Information($"Get Contacts with parameters {status}, {limit} and {offset} responded with {response}");
+                this.logger.Information($"Get Contacts with parameters {status}, {limit} and {offset} responded with {JsonSerializer.Serialize(response)}");
                 return this.Ok(response);
             }
 
-            this.logger.Error($"Get Contacts with parameters {status}, {limit} and {offset} responded with {response}");
+            this.logger.Error($"Get Contacts with parameters {status}, {limit} and {offset} responded with {JsonSerializer.Serialize(response)}");
+            return this.BadRequest(response);
+        }
+
+        [HttpGet]
+        [Route("{contactId}")]
+        public async Task<IActionResult> GetAsync(int contactId)
+        {
+            this.logger.Information($"Group GET Api is called with parameter {contactId}");
+            var response = await this.contactsManager.GetByKeyAsync(contactId).ConfigureAwait(false);
+            if (response.Code == ApiResponseCode.Success)
+            {
+                this.logger.Information($"Group Get successful for parameter = {contactId} with response = {JsonSerializer.Serialize(response)} ");
+                return this.Ok(response);
+            }
+
+            this.logger.Error($"Group Get failed for parameter = {contactId} with response = {JsonSerializer.Serialize(response)} ");
             return this.BadRequest(response);
         }
     }

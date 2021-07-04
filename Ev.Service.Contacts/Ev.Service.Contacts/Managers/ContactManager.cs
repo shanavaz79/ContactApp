@@ -25,6 +25,29 @@ namespace Ev.Service.Contacts.Managers
             this.logger = logger?.GetInstance();
         }
 
+        public async Task<ApiResponseDto> GetByKeyAsync(int contactId)
+        {
+            var apiResponseDto = new ApiResponseDto();
+            if (contactId <= 0)
+            {
+                apiResponseDto.Code = ApiResponseCode.MissingMandatoryInformation;
+                apiResponseDto.Errors.Add(new ErrorDto { Error = $"Contact Id: '{contactId}' is invalid." });
+                return apiResponseDto;
+            }
+
+            var groups = await this.contactsRepository.GetAsync(x => x.Id == contactId).ConfigureAwait(false);
+            if (groups.Any())
+            {
+                apiResponseDto.Code = ApiResponseCode.Success;
+                apiResponseDto.Data = this.AssembleContactsDto(groups.First());
+                return apiResponseDto;
+            }
+
+            apiResponseDto.Code = ApiResponseCode.NoDataFound;
+            apiResponseDto.Errors.Add(new ErrorDto { Error = $"Contact with key: '{contactId}' not found." });
+            return apiResponseDto;
+        }
+
         /// <summary>
         /// Get Contacts.
         /// </summary>
