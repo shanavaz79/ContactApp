@@ -53,6 +53,7 @@ namespace Ev.Service.Contacts
             services.AddSingleton<IConfiguration>(this.Configuration);
             services.AddTransient<IContactsManager, ContactsManager>();
             services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            services.AddApplicationInsightsTelemetry();
 
             string contactDbConnectionString = this.Configuration.GetValue<string>("ContactAdmin:ContactDB:ConnectionString");
             if (string.IsNullOrWhiteSpace(contactDbConnectionString))
