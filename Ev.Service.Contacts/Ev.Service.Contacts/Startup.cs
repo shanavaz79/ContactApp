@@ -1,5 +1,6 @@
 using Ev.Service.Contacts.Dto;
 using Ev.Service.Contacts.Logs;
+using Ev.Service.Contacts.Managers;
 using Ev.Service.Contacts.Repository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
@@ -50,6 +51,9 @@ namespace Ev.Service.Contacts
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Contact Service", Version = "v1" });
             });
             services.AddSingleton<IConfiguration>(this.Configuration);
+            services.AddTransient<IContactsManager, ContactsManager>();
+            services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
             string contactDbConnectionString = this.Configuration.GetValue<string>("ContactAdmin:ContactDB:ConnectionString");
             if (string.IsNullOrWhiteSpace(contactDbConnectionString))
             {
@@ -91,7 +95,8 @@ namespace Ev.Service.Contacts
             app.UseExceptionHandler(a => a.Run(async context =>
             {
                 logger.LogError(context.Features.Get<IExceptionHandlerPathFeature>().Error, string.Empty);
-                var result = JsonConvert.SerializeObject(new { error = "Server error" });
+                var result = JsonConvert.SerializeObject(context.Features.Get<IExceptionHandlerPathFeature>().Error);
+                //var result = JsonConvert.SerializeObject(new { error = "Server error" });
                 context.Response.ContentType = "application/json";
                 await context.Response.WriteAsync(result).ConfigureAwait(false);
             }));
