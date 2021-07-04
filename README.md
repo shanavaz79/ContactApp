@@ -20,9 +20,11 @@ Second project is xUnit projects depiciting few unit tests for controller, servi
 1. Azure App insights logging
 
 ![image](https://user-images.githubusercontent.com/14089065/124383679-5bc51500-dceb-11eb-955e-fdfb50744967.png)
+
 2. Invalid model schema handling
 
 ![image](https://user-images.githubusercontent.com/14089065/124386895-23790300-dcfa-11eb-8e05-941069e416d5.png)
+
 3. Serilog integration.  Serilog has many sinks and currently in this project we are using Azure app insights.
 
 
