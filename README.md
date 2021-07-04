@@ -13,6 +13,7 @@ https://localhost:44385/swagger/index.html
 ## Folder Structure
 This solution has two projects.  Web Api project which is build in .Net Core 3.1.  This uses Azure SQL db to store contacts.
 Second project is xUnit projects depiciting few unit tests for controller, service and repository.
+
 ![image](https://user-images.githubusercontent.com/14089065/124387847-b9faf380-dcfd-11eb-9b92-558fb8a638b1.png)
 
 ## Features
