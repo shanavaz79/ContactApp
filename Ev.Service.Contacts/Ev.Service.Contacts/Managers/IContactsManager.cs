@@ -8,5 +8,7 @@ namespace Ev.Service.Contacts.Managers
         ApiResponseDto GetContacts(string status, int? limit, int? offset);
         Task<ApiResponseDto> GetByKeyAsync(int contactId);
         Task<ApiResponseDto> AddContact(PostContactDto contact);
+        Task<ApiResponseDto> UpdateContactAsync(PutContactDto contact);
+        Task<ApiResponseDto> PatchContact(PatchContactDto patchContactDto);
     }
 }

@@ -37,23 +37,14 @@ namespace Ev.Service.Contacts.Managers
                 return response;
             }
 
-            Models.Contact contactEntity;
-
-            if (contact != null)
+            var contactEntity = new Models.Contact
             {
-                contactEntity = new Models.Contact
-                {
-                    FirstName = contact.FirstName,
-                    Email = contact.Email,
-                    LastName = contact.LastName,
-                    PhoneNumber = contact.PhoneNumber,
-                    Status = (ContactStatus)Enum.Parse(typeof(ContactStatus), contact.Status.Trim(), true)
-                };
-            }
-            else
-            {
-                return CreateErrorResponse(ApiResponseCode.MissingMandatoryInformation, "Contact cannot be null.", response);
-            }
+                FirstName = contact.FirstName,
+                Email = contact.Email,
+                LastName = contact.LastName,
+                PhoneNumber = contact.PhoneNumber,
+                Status = (ContactStatus)Enum.Parse(typeof(ContactStatus), contact.Status.Trim(), true)
+            };
 
             this.contactsRepository.Insert(contactEntity);
             await this.contactsRepository.SaveAsync().ConfigureAwait(false);
@@ -100,6 +91,23 @@ namespace Ev.Service.Contacts.Managers
                 {
                     CreateErrorResponse(ApiResponseCode.DuplicateData, "Contact with same Email already exits.", responseDto);
                 }
+            }
+        }
+
+        private void ParametersCheckForContact(PutContactDto contact, ApiResponseDto responseDto)
+        {
+            if (contact == null)
+            {
+                CreateErrorResponse(ApiResponseCode.MissingMandatoryInformation, "Contact cannot be null.", responseDto);
+                return;
+            }
+            if (!Enum.TryParse(contact.Status.Trim(), true, out ContactStatus contactStatus))
+            {
+                CreateErrorResponse(ApiResponseCode.InvalidData, "Contact Status should be Active or Inactive.", responseDto);
+            }
+            if (string.IsNullOrEmpty(contact.Email?.Trim()))
+            {
+                CreateErrorResponse(ApiResponseCode.MissingMandatoryInformation, "Contact Email cannot be null.", responseDto);
             }
         }
 
@@ -161,6 +169,69 @@ namespace Ev.Service.Contacts.Managers
         private ContactsDto AssembleContactsDto(Models.Contact contact)
         {
             return new ContactsDto { Status = contact.Status.ToString(), Email = contact.Email, FirstName = contact.FirstName, Id = contact.Id, LastName = contact.LastName, PhoneNumber = contact.PhoneNumber };
+        }
+
+        public async Task<ApiResponseDto> UpdateContactAsync(PutContactDto contact)
+        {
+            var response = new ApiResponseDto();
+            this.ParametersCheckForContact(contact, response);
+
+            if (response.Errors.Any())
+            {
+                response.Code = response.Errors.Count > 1 ? ApiResponseCode.MultipleErrors : response.Errors[0].Code;
+                return response;
+            }
+            var dbContact = await this.contactsRepository.GetByIdAsync(contact.Id);
+
+            dbContact.FirstName = contact.FirstName;
+            dbContact.Email = contact.Email;
+            dbContact.LastName = contact.LastName;
+            dbContact.PhoneNumber = contact.PhoneNumber;
+            dbContact.Status = (ContactStatus)Enum.Parse(typeof(ContactStatus), contact.Status.Trim(), true);
+
+            this.contactsRepository.Update(dbContact);
+            await this.contactsRepository.SaveAsync().ConfigureAwait(false);
+            return new ApiResponseDto
+            {
+                Data = this.AssembleContactsDto(dbContact),
+                Code = ApiResponseCode.Success,
+            };
+        }
+
+        public async Task<ApiResponseDto> PatchContact(PatchContactDto patchContactDto)
+        {
+            var response = new ApiResponseDto();
+
+            if (patchContactDto is null)
+            {
+                response.Code = ApiResponseCode.MissingMandatoryInformation;
+                response.Errors.Add(new ErrorDto { Error = "PATCH contact info is missing.", Code = ApiResponseCode.MissingMandatoryInformation });
+
+                return response;
+            }
+            if (!Enum.TryParse(patchContactDto.Status.Trim(), true, out ContactStatus contactStatus))
+            {
+                response.Code = ApiResponseCode.InvalidData;
+                response.Errors.Add(new ErrorDto { Error = "PATCH Contact Status should be Active or Inactive.", Code = ApiResponseCode.InvalidData });
+
+                return response;
+            }
+            var contactToUpdate = await this.contactsRepository.GetByIdAsync(patchContactDto.Id).ConfigureAwait(false);
+            if (contactToUpdate is null)
+            {
+                this.logger.Error($"No records exist for contact id: {patchContactDto.Id}");
+                response.Errors.Add(new ErrorDto { Error = $"No records exist for contact id: {patchContactDto.Id}", Code = ApiResponseCode.NoDataFound });
+                return response;
+            }
+
+            contactToUpdate.Status = (ContactStatus)Enum.Parse(typeof(ContactStatus), patchContactDto.Status.Trim(), true);
+            this.contactsRepository.Update(contactToUpdate);
+
+            response.Data = this.AssembleContactsDto(contactToUpdate);
+
+            await this.contactsRepository.SaveAsync().ConfigureAwait(false);
+
+            return response;
         }
     }
 }

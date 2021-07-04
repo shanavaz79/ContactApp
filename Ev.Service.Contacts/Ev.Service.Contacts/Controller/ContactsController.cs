@@ -77,5 +77,36 @@ namespace Ev.Service.Contacts
             this.logger.Error($"Contact POST failed for parameter = {JsonSerializer.Serialize(contact)} with response = {JsonSerializer.Serialize(response)} ");
             return this.BadRequest(response);
         }
+
+        [HttpPut]
+        public async Task<IActionResult> PutAsync(PutContactDto contact)
+        {
+            this.logger.Information("Contact PUT Api called with parameter {0}", JsonSerializer.Serialize(contact));
+            var response = await this.contactsManager.UpdateContactAsync(contact).ConfigureAwait(false);
+            if (response.Code == ApiResponseCode.Success)
+            {
+                this.logger.Information($"Contact PUT Api successful for parameter = {JsonSerializer.Serialize(contact)} with response = {JsonSerializer.Serialize(response)} ");
+                return this.Ok(response);
+            }
+
+            this.logger.Error($"Contact PUT Api failed for parameter = {JsonSerializer.Serialize(contact)} with response = {JsonSerializer.Serialize(response)} ");
+            return this.BadRequest(response);
+
+        }
+
+        [HttpPatch]
+        public async Task<IActionResult> PatchAsync(PatchContactDto patchContactDto)
+        {
+            this.logger.Information("Contact PATCH Api called with parameter {0}", JsonSerializer.Serialize(patchContactDto));
+            var response = await this.contactsManager.PatchContact(patchContactDto).ConfigureAwait(false);
+            if (response.Code == ApiResponseCode.Success)
+            {
+                this.logger.Information($"Contact PATCH Api successful for parameter = {JsonSerializer.Serialize(patchContactDto)} with response = {JsonSerializer.Serialize(response)} ");
+                return this.Ok(response);
+            }
+
+            this.logger.Error($"Contact PATCH Api failed for parameter = {JsonSerializer.Serialize(patchContactDto)} with response = {JsonSerializer.Serialize(response)} ");
+            return this.BadRequest(response);
+        }
     }
 }
