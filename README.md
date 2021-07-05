@@ -28,7 +28,7 @@ Second project is xUnit projects depiciting few unit tests for controller, servi
 3. Serilog integration.  Serilog has many sinks and currently in this project we are using Azure app insights.
 
 
-## Future enchancements
+## Future enhancements
 1. Authentication with Azure AD or Azure B2C.  
 2. Defining roles for Get and Update operations.
 3. Healthz.  /healthz endpoint to check the status of services.
