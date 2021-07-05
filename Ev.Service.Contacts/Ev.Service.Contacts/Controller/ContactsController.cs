@@ -1,17 +1,15 @@
-﻿using Ev.Service.Contacts.Dto;
-using Ev.Service.Contacts.Logs;
-using Ev.Service.Contacts.Managers;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json;
-using System.Threading.Tasks;
+﻿
 
 namespace Ev.Service.Contacts
 {
+    using Ev.Service.Contacts.Dto;
+    using Ev.Service.Contacts.Logs;
+    using Ev.Service.Contacts.Managers;
+    using Microsoft.AspNetCore.Mvc;
+    using Serilog;
+    using System.Text.Json;
+    using System.Threading.Tasks;
+
     [Route("api/[controller]")]
     [ApiController]
     public class ContactsController : ControllerBase

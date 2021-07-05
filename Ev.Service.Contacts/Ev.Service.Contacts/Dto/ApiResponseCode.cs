@@ -46,7 +46,6 @@ namespace Ev.Service.Contacts.Dto
         /// </summary>
         NoDataFound = 1006,
 
-
         /// <summary>
         /// The multiple errors
         /// </summary>

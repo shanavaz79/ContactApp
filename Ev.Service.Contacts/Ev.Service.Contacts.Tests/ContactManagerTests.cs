@@ -5,9 +5,7 @@ namespace Ev.Service.Contacts.Tests
     using Moq;
     using Serilog;
     using Xunit;
-    using System;
     using Ev.Service.Contacts.Dto;
-    using Microsoft.AspNetCore.Mvc;
     using Ev.Service.Contacts.Managers;
     using Ev.Service.Contacts.Logs;
     using Ev.Service.Contacts.Models;

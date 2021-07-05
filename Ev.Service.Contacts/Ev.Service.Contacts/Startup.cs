@@ -1,28 +1,26 @@
-using Ev.Service.Contacts.Dto;
-using Ev.Service.Contacts.Logs;
-using Ev.Service.Contacts.Managers;
-using Ev.Service.Contacts.Repository;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Models;
-using Newtonsoft.Json;
-using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Mime;
-using System.Threading.Tasks;
 
 namespace Ev.Service.Contacts
 {
+    using Ev.Service.Contacts.Dto;
+    using Ev.Service.Contacts.Logs;
+    using Ev.Service.Contacts.Managers;
+    using Ev.Service.Contacts.Repository;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Diagnostics;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Hosting;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.OpenApi.Models;
+    using Newtonsoft.Json;
+    using Serilog;
+    using System.Linq;
+    using System.Net.Mime;
+
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -96,20 +94,13 @@ namespace Ev.Service.Contacts
             app.UseExceptionHandler(a => a.Run(async context =>
             {
                 logger.LogError(context.Features.Get<IExceptionHandlerPathFeature>().Error, string.Empty);
-                var result = JsonConvert.SerializeObject(context.Features.Get<IExceptionHandlerPathFeature>().Error);
-                //var result = JsonConvert.SerializeObject(new { error = "Server error" });
+                //var result = JsonConvert.SerializeObject(context.Features.Get<IExceptionHandlerPathFeature>().Error);  //Uncomment this and comment next line if we want to see actual error.
+                var result = JsonConvert.SerializeObject(new { error = "Server error" });
                 context.Response.ContentType = "application/json";
                 await context.Response.WriteAsync(result).ConfigureAwait(false);
             }));
-            //app.UseCors("AllowOrigin");
+            //app.UseCors("AllowOrigin");  //Uncomment this line to allow cors from frontend.
 
-            //app.UseEndpoints(endpoints =>
-            //{
-            //    endpoints.MapGet("/", async context =>
-            //    {
-            //        await context.Response.WriteAsync("Hello World!");
-            //    });
-            //});
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
