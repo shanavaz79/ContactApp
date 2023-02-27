@@ -23,7 +23,7 @@ jobs:
           include-prerelease: true
 
       - name: Build with dotnet
-        run: dotnet build ContactApp/Ev.Service.Contacts/Ev.Service.Contacts.sln --configuration Release
+        run: dotnet build Ev.Service.Contacts/Ev.Service.Contacts/Ev.Service.Contacts.csproj --configuration Release
 
       - name: dotnet publish
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
