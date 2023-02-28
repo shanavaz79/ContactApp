@@ -20,6 +20,7 @@ namespace Ev.Service.Contacts
     using Serilog;
     using System.Linq;
     using System.Net.Mime;
+    using Azure.Identity;
 
     public class Startup
     {
@@ -53,12 +54,13 @@ namespace Ev.Service.Contacts
             services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddApplicationInsightsTelemetry();
 
-            string contactDbConnectionString = this.Configuration.GetValue<string>("ContactAdmin:ContactDB:ConnectionString");
-            if (string.IsNullOrWhiteSpace(contactDbConnectionString))
-            {
-                throw new System.Configuration.ConfigurationErrorsException($"{nameof(contactDbConnectionString)}, this parameter is null");
-            }
-            services.AddDbContext<ContactDBContext>(opts => opts.UseSqlServer(contactDbConnectionString));
+            //string contactDbConnectionString = this.Configuration.GetValue<string>("ContactAdmin:ContactDB:ConnectionString");
+            //if (string.IsNullOrWhiteSpace(contactDbConnectionString))
+            //{
+            //    throw new System.Configuration.ConfigurationErrorsException($"{nameof(contactDbConnectionString)}, this parameter is null");
+            //}
+            services.AddDbContext<ContactDBContext>();
+            //services.AddDbContext<ContactDBContext>(opts => opts.UseSqlServer(contactDbConnectionString));
 
             services.Configure<ApiBehaviorOptions>(options =>
             {

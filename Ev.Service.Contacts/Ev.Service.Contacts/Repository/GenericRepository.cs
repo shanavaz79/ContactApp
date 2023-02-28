@@ -18,13 +18,13 @@ namespace Ev.Service.Contacts.Repository
         private readonly ContactDBContext context;
         private readonly DbSet<TEntity> dbSet;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="GenericRepository{TEntity}"/> class.
-        /// </summary>
-        public GenericRepository()
-            : this(new ContactDBContext())
-        {
-        }
+        ///// <summary>
+        ///// Initializes a new instance of the <see cref="GenericRepository{TEntity}"/> class.
+        ///// </summary>
+        //public GenericRepository()
+        //    : this(new ContactDBContext())
+        //{
+        //}
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GenericRepository{TEntity}" /> class.
